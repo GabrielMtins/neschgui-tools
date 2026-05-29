@@ -1,8 +1,8 @@
 CC:=gcc
-INCLUDE_FLAGS:=-I./external/stb -I./rom_tools
+INCLUDE_FLAGS:=-I../external/stb -I../core
 CC_FLAGS:=-std='c99' -Wall -Wextra -pedantic -O2
 
-NES2PNG_SRC:= rom_tools/nes2png.c
+NES2PNG_SRC:= nes2png.c
 
 all: nes2png
 
