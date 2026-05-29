@@ -25,6 +25,8 @@ typedef struct {
 
 Rom_Viewer Rom_CreateViewer(Rom_Format format, void *data, size_t size);
 
+size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles);
+
 uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
 
 void Rom_SetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y, uint8_t c);
@@ -40,10 +42,6 @@ typedef struct {
 } Rom_NesTile;
 
 typedef struct {
-	/*
-	uint8_t plane0[8];
-	uint8_t plane1[8];
-	*/
 	uint8_t data[16];
 } Rom_GbTile;
 
@@ -93,11 +91,25 @@ Rom_Viewer Rom_CreateViewer(Rom_Format format, void *data, size_t size) {
 	return viewer;
 }
 
+size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles) {
+	size_t ret;
+
+	#define EXPAND_AS_CASE(id, type, get, set) case id: ret = num_tiles * sizeof(type); break;
+
+	switch(format) {
+		FOR_TILE_TYPE_LIST(EXPAND_AS_CASE)
+	}
+
+	#undef EXPAND_AS_CASE
+
+	return ret;
+}
+
 uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
 	uint8_t ret_value = 0xff;
 
 	if(tile_id >= viewer->num_tiles) {
-		return 0xff;
+		return 0x00;
 	}
 
 	#define EXPAND_AS_CASE(id, type, get, set) case id: ret_value = get(((type *) viewer->data) + tile_id, x, y); break;

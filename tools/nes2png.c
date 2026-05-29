@@ -43,6 +43,11 @@ int main(int argc, char **argv) {
 			}
 
 			i++;
+		} else if(!strcmp(argv[i], "--num-tiles-row")){
+			if(sscanf(argv[i + 1], "%d", &num_tiles_row) != 1) {
+				fprintf(stderr, "%s: Failed to load variable num-tiles-row.\n", argv[0]);
+				return -1;
+			} 
 		} else {
 			usage(argv[0]);
 			return -1;
@@ -52,8 +57,10 @@ int main(int argc, char **argv) {
 	data = stdin_read(&rom_size);
 
 	viewer = Rom_CreateViewer(format, data, rom_size);
+
+	fprintf(stderr, "%lu\n", viewer.num_tiles);
 	
-	num_tiles_column = viewer.num_tiles / num_tiles_row;
+	num_tiles_column = viewer.num_tiles / num_tiles_row + (viewer.num_tiles % num_tiles_row != 0);
 	img = (uint32_t *) malloc(TILE_SIZE * TILE_SIZE * sizeof(uint32_t) * viewer.num_tiles);
 
 	width = num_tiles_row * TILE_SIZE;
