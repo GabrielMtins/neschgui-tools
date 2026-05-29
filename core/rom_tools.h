@@ -40,8 +40,11 @@ typedef struct {
 } Rom_NesTile;
 
 typedef struct {
+	/*
 	uint8_t plane0[8];
 	uint8_t plane1[8];
+	*/
+	uint8_t data[16];
 } Rom_GbTile;
 
 static uint8_t Nes_GetColor(Rom_NesTile *tile, uint8_t x, uint8_t y) {
@@ -60,14 +63,17 @@ static void Nes_SetColor(Rom_NesTile *tile, uint8_t x, uint8_t y, uint8_t c) {
 }
 
 static uint8_t Gb_GetColor(Rom_GbTile *tile, uint8_t x, uint8_t y) {
+	x = 7 - x;
 	return
-		(GET_BIT(tile->plane1[y], x) << 1) |
-		(GET_BIT(tile->plane0[y], x));
+		(GET_BIT(tile->data[y * 2 + 1], x) << 1) |
+		(GET_BIT(tile->data[y * 2], x));
 }
 
 static void Gb_SetColor(Rom_GbTile *tile, uint8_t x, uint8_t y, uint8_t c) {
-	SET_BIT(tile->plane0[y], x, c);
-	SET_BIT(tile->plane1[y], x, c >> 1);
+	x = 7 - x;
+
+	SET_BIT(tile->data[y * 2 + 1], x, c >> 1);
+	SET_BIT(tile->data[y * 2], x, c);
 }
 
 Rom_Viewer Rom_CreateViewer(Rom_Format format, void *data, size_t size) {

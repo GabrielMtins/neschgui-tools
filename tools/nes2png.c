@@ -1,22 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "rom_tools.h"
+#include "util.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define TILE_SIZE 8
-
-uint32_t palette[16] = {
-	0xFFFFFFFF,
-	0xFFC0C0C0,
-	0xFF808080,
-	0XFF000000
-};
+void usage(const char *prog) {
+	fprintf(
+			stderr,
+			"Usage: %s [OPTIONS]",
+			prog
+		   );
+}
 
 int main(int argc, char **argv) {
-	FILE *in = stdin, *out = stdout;
 	size_t rom_size;
 	void *data;
 	Rom_Viewer viewer;
@@ -24,23 +24,35 @@ int main(int argc, char **argv) {
 	int num_tiles_column = 0;
 	int width, height;
 	uint32_t *img;
+	Rom_Format format = ROM_TYPE_NES;
 
-	in = fopen("smb_og.nes", "rb");
+	for(int i = 1; i < argc; i++) {
+		if(!strcmp(argv[i], "--format-nes")) {
+			format = ROM_TYPE_NES;
+		} else if(!strcmp(argv[i], "--format-gb")) {
+			format = ROM_TYPE_GB;
+		} else if(i == argc - 1) {
+			continue;
+		} else if(!strcmp(argv[i], "--palette")) {
+			read_palette(argv[i + 1]);
+			i++;
+		} else if(!strcmp(argv[i], "--palette-file")) {
+			if(read_palette_file(argv[i + 1]) != 0) {
+				fprintf(stderr, "%s: Failed to read palette file: %s\n", argv[0], argv[i + 1]);
+				return -1;
+			}
 
-	fseek(in, 0, SEEK_END);
-	rom_size = ftell(in);
-	fseek(in, 0, SEEK_SET);
-
-	if(rom_size == 0) {
-		return -1;
+			i++;
+		} else {
+			usage(argv[0]);
+			return -1;
+		}
 	}
 
-	data = malloc(rom_size);
+	data = stdin_read(&rom_size);
 
-	fread(data, 1, rom_size, in);
-
-	viewer = Rom_CreateViewer(ROM_TYPE_NES, data, rom_size);
-
+	viewer = Rom_CreateViewer(format, data, rom_size);
+	
 	num_tiles_column = viewer.num_tiles / num_tiles_row;
 	img = (uint32_t *) malloc(TILE_SIZE * TILE_SIZE * sizeof(uint32_t) * viewer.num_tiles);
 
@@ -56,13 +68,17 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	stbi_write_png("out.png", width, height, 4, img, width * 4);
+	stbi_write_png_to_func(
+			stdout_write,
+			NULL,
+			width,
+			height,
+			4,
+			img, width * 4
+			);
 
 	free(img);
 	free(data);
-
-	if(in != stdin) fclose(in);
-	if(out != stdout) fclose(out);
 
 	return 0;
 }
