@@ -92,7 +92,7 @@ Rom_Viewer Rom_CreateViewer(Rom_Format format, void *data, size_t size) {
 }
 
 size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles) {
-	size_t ret;
+	size_t ret = 0;
 
 	#define EXPAND_AS_CASE(id, type, get, set) case id: ret = num_tiles * sizeof(type); break;
 
@@ -106,7 +106,7 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles) {
 }
 
 uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
-	uint8_t ret_value = 0xff;
+	uint8_t ret_value = 0x00;
 
 	if(tile_id >= viewer->num_tiles) {
 		return 0x00;

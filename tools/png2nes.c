@@ -5,6 +5,8 @@
 #include "rom_tools.h"
 #include "util.h"
 
+#include <math.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -16,6 +18,14 @@ int get_color_id(uint32_t color) {
 	}
 
 	return -1;
+}
+
+void usage(const char *prog) {
+	fprintf(
+			stderr,
+			"Usage: %s [OPTIONS]",
+			prog
+		   );
 }
 
 int main(int argc, char **argv) {
@@ -31,6 +41,29 @@ int main(int argc, char **argv) {
 	Rom_Format format = ROM_TYPE_NES;
 	Rom_Viewer viewer;
 
+	for(int i = 1; i < argc; i++) {
+		if(!strcmp(argv[i], "--format-nes")) {
+			format = ROM_TYPE_NES;
+		} else if(!strcmp(argv[i], "--format-gb")) {
+			format = ROM_TYPE_GB;
+		} else if(i == argc - 1) {
+			continue;
+		} else if(!strcmp(argv[i], "--palette")) {
+			read_palette(argv[i + 1]);
+			i++;
+		} else if(!strcmp(argv[i], "--palette-file")) {
+			if(read_palette_file(argv[i + 1]) != 0) {
+				fprintf(stderr, "%s: Failed to read palette file: %s\n", argv[0], argv[i + 1]);
+				return -1;
+			}
+
+			i++;
+		} else {
+			usage(argv[0]);
+			return -1;
+		}
+	}
+
 	raw_img = stdin_read(&img_size);
 
 	img = (uint32_t *) stbi_load_from_memory(
@@ -42,9 +75,8 @@ int main(int argc, char **argv) {
 			4
 			);
 
-	num_tiles_total = width * height / (TILE_SIZE * TILE_SIZE);
-
-	fprintf(stderr, "%lu\n", num_tiles_total);
+	num_tiles_row = width / TILE_SIZE;
+	num_tiles_total = num_tiles_row * (height / TILE_SIZE);
 
 	data_size = Rom_GetRomSizeByTiles(format, num_tiles_total);
 
