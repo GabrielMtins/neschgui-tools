@@ -27,6 +27,8 @@ Rom_Viewer Rom_CreateViewer(Rom_Format format, void *data, size_t size);
 
 size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles);
 
+void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles);
+
 uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
 
 void Rom_SetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y, uint8_t c);
@@ -103,6 +105,25 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles) {
 	#undef EXPAND_AS_CASE
 
 	return ret;
+}
+
+void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
+	size_t offset_bytes = 0;
+	uint8_t *data;
+
+	if(offset_tiles >= viewer->num_tiles) {
+		return;
+	}
+
+	#define EXPAND_AS_CASE(id, type, get, set) case id: offset_bytes = offset_tiles * sizeof(type); break;
+
+	switch(viewer->format) {
+		FOR_TILE_TYPE_LIST(EXPAND_AS_CASE)
+	}
+
+	viewer->data = (void *) (((uint8_t *) viewer->data) + offset_bytes);
+
+	viewer->num_tiles -= offset_tiles;
 }
 
 uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
