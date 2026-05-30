@@ -23,7 +23,7 @@ int get_color_id(uint32_t color) {
 void usage(const char *prog) {
 	fprintf(
 			stderr,
-			"Usage: %s [OPTIONS]",
+			"Usage: %s [OPTIONS]\n",
 			prog
 		   );
 }

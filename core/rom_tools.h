@@ -109,7 +109,6 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles) {
 
 void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
 	size_t offset_bytes = 0;
-	uint8_t *data;
 
 	if(offset_tiles >= viewer->num_tiles) {
 		return;
@@ -120,6 +119,8 @@ void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
 	switch(viewer->format) {
 		FOR_TILE_TYPE_LIST(EXPAND_AS_CASE)
 	}
+
+	#undef EXPAND_AS_CASE
 
 	viewer->data = (void *) (((uint8_t *) viewer->data) + offset_bytes);
 

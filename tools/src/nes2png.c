@@ -11,7 +11,7 @@
 void usage(const char *prog) {
 	fprintf(
 			stderr,
-			"Usage: %s [OPTIONS]",
+			"Usage: %s [OPTIONS]\n",
 			prog
 		   );
 }
