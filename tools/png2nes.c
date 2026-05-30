@@ -35,9 +35,8 @@ int main(int argc, char **argv) {
 	size_t data_size;
 	size_t img_size;
 	int width, height;
-	size_t num_tiles_total;
+	int num_tiles_total;
 	int num_tiles_row = 16;
-	int num_tiles_column = 0;
 	Rom_Format format = ROM_TYPE_NES;
 	Rom_Viewer viewer;
 
@@ -54,6 +53,13 @@ int main(int argc, char **argv) {
 		} else if(!strcmp(argv[i], "--palette-file")) {
 			if(read_palette_file(argv[i + 1]) != 0) {
 				fprintf(stderr, "%s: Failed to read palette file: %s\n", argv[0], argv[i + 1]);
+				return -1;
+			}
+
+			i++;
+		} else if(!strcmp(argv[i], "--num-tiles-total")) {
+			if(sscanf(argv[i + 1], "%d", &num_tiles_total) != 1) {
+				fprintf(stderr, "%s: Failed to num-tiles-total", argv[0]);
 				return -1;
 			}
 
@@ -76,7 +82,10 @@ int main(int argc, char **argv) {
 			);
 
 	num_tiles_row = width / TILE_SIZE;
-	num_tiles_total = num_tiles_row * (height / TILE_SIZE);
+
+	if(num_tiles_total == 0) {
+		num_tiles_total = num_tiles_row * (height / TILE_SIZE);
+	}
 
 	data_size = Rom_GetRomSizeByTiles(format, num_tiles_total);
 
