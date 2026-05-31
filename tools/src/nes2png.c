@@ -20,9 +20,10 @@ int main(int argc, char **argv) {
 	size_t rom_size;
 	void *data;
 	Rom_Viewer viewer;
-	int num_tiles_row = 16;
-	int num_tiles_column = 0;
-	int width, height;
+	size_t num_tiles_row = 16;
+	size_t num_tiles_column = 0;
+	size_t start_tile_offset;
+	size_t width, height;
 	Color *img;
 	Rom_Format format = ROM_TYPE_NES;
 
@@ -44,10 +45,24 @@ int main(int argc, char **argv) {
 
 			i++;
 		} else if(!strcmp(argv[i], "--num-tiles-row")){
-			if(sscanf(argv[i + 1], "%d", &num_tiles_row) != 1) {
-				fprintf(stderr, "%s: Failed to load variable num-tiles-row.\n", argv[0]);
+			unsigned int tmp;
+
+			if(sscanf(argv[i + 1], "%u", &tmp) != 1) {
+				fprintf(stderr, "%s: Failed to read variable num-tiles-row.\n", argv[0]);
 				return -1;
 			} 
+
+			num_tiles_row = tmp;
+
+			i++;
+		} else if(!strcmp(argv[i], "--start-tile-offset")) {
+			unsigned int tmp;
+
+			if(sscanf(argv[i + 1], "%u", &tmp) != 1) {
+				fprintf(stderr, "%s: Failed to read variable start-tile-offset", argv[0]);
+			}
+
+			start_tile_offset = tmp;
 
 			i++;
 		} else {
@@ -60,14 +75,24 @@ int main(int argc, char **argv) {
 
 	viewer = Rom_CreateViewer(format, data, rom_size);
 
+	if(start_tile_offset >= viewer.num_tiles) {
+		fprintf(stderr, "%s: Variable start-tile-offset is greater than the number of tiles.\n", argv[0]);
+
+		return -1;
+	}
+
+	if(start_tile_offset != 0) {
+		Rom_AdvanceOffset(&viewer, start_tile_offset);
+	}
+
 	num_tiles_column = viewer.num_tiles / num_tiles_row + (viewer.num_tiles % num_tiles_row != 0);
 	img = (Color *) malloc(TILE_SIZE * TILE_SIZE * sizeof(uint32_t) * num_tiles_column * num_tiles_row);
 
 	width = num_tiles_row * TILE_SIZE;
 	height = num_tiles_column * TILE_SIZE;
 
-	for(int j = 0; j < height; j++) {
-		for(int i = 0; i < width; i++) {
+	for(size_t j = 0; j < height; j++) {
+		for(size_t i = 0; i < width; i++) {
 			size_t tile_id = (i / TILE_SIZE) + (j / TILE_SIZE) * num_tiles_row;
 			uint8_t color_id = Rom_GetTilePixelColor(&viewer, tile_id, i % TILE_SIZE, j % TILE_SIZE);
 

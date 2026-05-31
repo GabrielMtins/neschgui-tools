@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
 	size_t data_size;
 	size_t img_size;
 	int width, height;
-	int num_tiles_total = 0;
-	int num_tiles_row = 16;
+	size_t num_tiles_total = 0;
+	size_t num_tiles_row = 16;
 	Rom_Format format = ROM_TYPE_NES;
 	Rom_Viewer viewer;
 
@@ -58,10 +58,14 @@ int main(int argc, char **argv) {
 
 			i++;
 		} else if(!strcmp(argv[i], "--num-tiles-total")) {
-			if(sscanf(argv[i + 1], "%d", &num_tiles_total) != 1) {
+			unsigned int tmp;
+
+			if(sscanf(argv[i + 1], "%u", &tmp) != 1) {
 				fprintf(stderr, "%s: Failed to num-tiles-total\n", argv[0]);
 				return -1;
 			}
+
+			num_tiles_total = tmp;
 
 			i++;
 		} else {
@@ -95,7 +99,7 @@ int main(int argc, char **argv) {
 
 	for(int j = 0; j < height; j++) {
 		for(int i = 0; i < width; i++) {
-			int tile_id = (i / TILE_SIZE) + (j / TILE_SIZE) * num_tiles_row;
+			size_t tile_id = (i / TILE_SIZE) + (j / TILE_SIZE) * num_tiles_row;
 
 			int color = get_color_id(img[i + j * width]);
 
