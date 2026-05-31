@@ -2,40 +2,61 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <ctype.h>
 
 #define TILE_SIZE 8
 #define PALETTE_SIZE 16
 
-uint32_t palette[PALETTE_SIZE] = {
-	0xFFFFFFFF,
-	0xFFC0C0C0,
-	0xFF808080,
-	0XFF000000,
-	0xFFFFFFFF,
-	0xFFC0C0C0,
-	0xFF808080,
-	0XFF000000,
-	0xFFFFFFFF,
-	0xFFC0C0C0,
-	0xFF808080,
-	0XFF000000,
-	0xFFFFFFFF,
-	0xFFC0C0C0,
-	0xFF808080,
-	0XFF000000,
+typedef struct {
+	uint8_t r, g, b, a;
+} Color;
+
+Color palette[PALETTE_SIZE] = {
+	{0xff, 0xff, 0xff, 0xff},
+	{0xc0, 0xc0, 0xc0, 0xff},
+	{0x80, 0x80, 0x80, 0xff},
+	{0x00, 0x00, 0x00, 0xff},
+	{0xff, 0xff, 0xff, 0xff},
+	{0xc0, 0xc0, 0xc0, 0xff},
+	{0x80, 0x80, 0x80, 0xff},
+	{0x00, 0x00, 0x00, 0xff},
+	{0xff, 0xff, 0xff, 0xff},
+	{0xc0, 0xc0, 0xc0, 0xff},
+	{0x80, 0x80, 0x80, 0xff},
+	{0x00, 0x00, 0x00, 0xff},
+	{0xff, 0xff, 0xff, 0xff},
+	{0xc0, 0xc0, 0xc0, 0xff},
+	{0x80, 0x80, 0x80, 0xff},
+	{0x00, 0x00, 0x00, 0xff},
 };
 
 int read_palette(const char *pal) {
-	int count = 0, n;
+	int n;
+	size_t count = 0;
+	size_t len = strlen(pal);
+	unsigned int r, g, b;
+
+	static const size_t chr_read = 7;
 
 	for(int i = 0; i < PALETTE_SIZE; i++) {
-		if(sscanf(pal + count, "#%x%n", palette + i, &n) == 0) {
+		while(count < len && isspace((int) pal[count])) {
+			count++;
+		}
+
+		if(count + chr_read > len) {
 			break;
 		}
-		
+
+		if(sscanf(pal + count, "#%2x%2x%2x%n", &r, &g, &b, &n) != 3) {
+			break;
+		}
+
 		count += n;
 
-		palette[i] |= 0xFF000000;
+		palette[i].r = (uint8_t ) r;
+		palette[i].g = (uint8_t ) g;
+		palette[i].b = (uint8_t ) b;
+		palette[i].a = 0xff;
 	}
 
 	return 0;
@@ -43,6 +64,7 @@ int read_palette(const char *pal) {
 
 int read_palette_file(const char *filepath) {
 	FILE *file;
+	unsigned int r, g, b;
 
 	file = fopen(filepath, "r");
 
@@ -51,16 +73,20 @@ int read_palette_file(const char *filepath) {
 	}
 
 	for(int i = 0; i < PALETTE_SIZE; i++) {
-		if(feof(file)) {
+		int res = fscanf(file, "#%2x%2x%2x ", &r, &g, &b);
+
+		if(res == EOF) {
 			break;
 		}
 
-		if(fscanf(file, "#%x ", &palette[i]) != 1) {
-			fclose(file);
-			return -1;
+		if(res != 3) {
+			break;
 		}
 
-		palette[i] |= 0xFF000000;
+		palette[i].r = (uint8_t ) r;
+		palette[i].g = (uint8_t ) g;
+		palette[i].b = (uint8_t ) b;
+		palette[i].a = 0xff;
 	}
 
 	fclose(file);

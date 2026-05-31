@@ -10,9 +10,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-int get_color_id(uint32_t color) {
+int get_color_id(Color color) {
 	for(int i = 0; i < PALETTE_SIZE; i++) {
-		if(color == palette[i]) {
+		if(memcmp(&color, palette + i, sizeof(Color)) == 0) {
 			return i;
 		}
 	}
@@ -30,7 +30,7 @@ void usage(const char *prog) {
 
 int main(int argc, char **argv) {
 	uint32_t *raw_img;
-	uint32_t *img;
+	Color *img;
 	void *data;
 	size_t data_size;
 	size_t img_size;
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 			i++;
 		} else if(!strcmp(argv[i], "--num-tiles-total")) {
 			if(sscanf(argv[i + 1], "%d", &num_tiles_total) != 1) {
-				fprintf(stderr, "%s: Failed to num-tiles-total", argv[0]);
+				fprintf(stderr, "%s: Failed to num-tiles-total\n", argv[0]);
 				return -1;
 			}
 
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
 	raw_img = stdin_read(&img_size);
 
-	img = (uint32_t *) stbi_load_from_memory(
+	img = (Color *) stbi_load_from_memory(
 			(const unsigned char *) raw_img, 
 			img_size,
 			&width,
@@ -99,8 +99,8 @@ int main(int argc, char **argv) {
 
 			int color = get_color_id(img[i + j * width]);
 
-			if(color < -1) {
-				fprintf(stderr, "%s: Image contains a color not in the palette.", argv[0]);
+			if(color < 0) {
+				fprintf(stderr, "%s: Image contains a color not in the palette.\n", argv[0]);
 				return -1;
 			}
 

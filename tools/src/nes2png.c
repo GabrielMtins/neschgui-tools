@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	int num_tiles_row = 16;
 	int num_tiles_column = 0;
 	int width, height;
-	uint32_t *img;
+	Color *img;
 	Rom_Format format = ROM_TYPE_NES;
 
 	for(int i = 1; i < argc; i++) {
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 	viewer = Rom_CreateViewer(format, data, rom_size);
 
 	num_tiles_column = viewer.num_tiles / num_tiles_row + (viewer.num_tiles % num_tiles_row != 0);
-	img = (uint32_t *) malloc(TILE_SIZE * TILE_SIZE * sizeof(uint32_t) * num_tiles_column * num_tiles_row);
+	img = (Color *) malloc(TILE_SIZE * TILE_SIZE * sizeof(uint32_t) * num_tiles_column * num_tiles_row);
 
 	width = num_tiles_row * TILE_SIZE;
 	height = num_tiles_column * TILE_SIZE;

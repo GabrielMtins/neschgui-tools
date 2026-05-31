@@ -1,4 +1,4 @@
-CC:=gcc
+CC:=clang
 INCLUDE_FLAGS:=-I../external/stb -I../core
 CC_FLAGS:=-std='c99' -Wall -Wextra -pedantic -O2
 
