@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ROM_TOOLS_IMPLEMENTATION
+
 #include "rom_tools.h"
 #include "util.h"
 

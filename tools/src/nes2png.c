@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ROM_TOOLS_IMPLEMENTATION
+
 #include "rom_tools.h"
 #include "util.h"
 
@@ -22,7 +24,7 @@ int main(int argc, char **argv) {
 	Rom_Viewer viewer;
 	size_t num_tiles_row = 16;
 	size_t num_tiles_column = 0;
-	size_t start_tile_offset;
+	size_t start_tile_offset = 0;
 	size_t width, height;
 	Color *img;
 	Rom_Format format = ROM_TYPE_NES;
