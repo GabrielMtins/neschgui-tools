@@ -1,10 +1,12 @@
 #ifndef ROM_TOOLS_H
 #define ROM_TOOLS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
-
-#define ROM_TOOLS_IMPLEMENTATION
 
 #define FOR_TILE_TYPE_LIST(DO) \
 	DO(ROM_TYPE_NES, Rom_NesTile, Nes_GetColor, Nes_SetColor) \
@@ -29,9 +31,13 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles);
 
 void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles);
 
-uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
+uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
 
 void Rom_SetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y, uint8_t c);
+
+#ifdef __cplusplus
+}
+#endif 
 
 #ifdef ROM_TOOLS_IMPLEMENTATION
 
@@ -127,7 +133,7 @@ void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
 	viewer->num_tiles -= offset_tiles;
 }
 
-uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
+uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
 	uint8_t ret_value = 0x00;
 
 	if(tile_id >= viewer->num_tiles) {
