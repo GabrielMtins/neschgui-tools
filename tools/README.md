@@ -22,6 +22,8 @@ Options:
 - `--format-nes` - NES format (default).
 - `--format-gb` - Game Boy format.
 - `--num-tiles-row` - The number of tiles per row of the image.
+- `--start-tile-offset` - The offset (in tiles) of the starting tile of the
+  final image.
 - `--palette "#ffffff #c0c0c0 #808080 #000000"` - set palette colors.
 - `--palette-file colors.txt` - read palette from a file.
 
