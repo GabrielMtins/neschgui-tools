@@ -31,6 +31,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${SDL2_INCLUDE_DIRS}
 	${SDL2_IMAGE_INCLUDE_DIRS}
 	"${PROJECT_SOURCE_DIR}/include"
+	"${PROJECT_SOURCE_DIR}/core"
 	"${PROJECT_SOURCE_DIR}/external/imgui/"
 	"${PROJECT_SOURCE_DIR}/external/imgui/backends/"
 )

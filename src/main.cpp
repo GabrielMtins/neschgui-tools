@@ -1,5 +1,7 @@
-#include <cstdio>
+#define ROM_TOOLS_IMPLEMENTATION
+#include <rom_tools.h>
 
+#include <cstdio>
 #include <memory>
 
 #include "App.hpp"
