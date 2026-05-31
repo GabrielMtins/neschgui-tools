@@ -29,7 +29,7 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles);
 
 void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles);
 
-uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
+uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
 
 void Rom_SetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y, uint8_t c);
 
@@ -47,7 +47,7 @@ typedef struct {
 	uint8_t data[16];
 } Rom_GbTile;
 
-static uint8_t Nes_GetColor(Rom_NesTile *tile, uint8_t x, uint8_t y) {
+static uint8_t Nes_GetColor(const Rom_NesTile *tile, uint8_t x, uint8_t y) {
 	x = 7 - x;
 
 	return
@@ -62,7 +62,7 @@ static void Nes_SetColor(Rom_NesTile *tile, uint8_t x, uint8_t y, uint8_t c) {
 	SET_BIT(tile->plane1[y], x, c >> 1);
 }
 
-static uint8_t Gb_GetColor(Rom_GbTile *tile, uint8_t x, uint8_t y) {
+static uint8_t Gb_GetColor(const Rom_GbTile *tile, uint8_t x, uint8_t y) {
 	x = 7 - x;
 	return
 		(GET_BIT(tile->data[y * 2 + 1], x) << 1) |
@@ -127,14 +127,14 @@ void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
 	viewer->num_tiles -= offset_tiles;
 }
 
-uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
+uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
 	uint8_t ret_value = 0x00;
 
 	if(tile_id >= viewer->num_tiles) {
 		return 0x00;
 	}
 
-	#define EXPAND_AS_CASE(id, type, get, set) case id: ret_value = get(((type *) viewer->data) + tile_id, x, y); break;
+	#define EXPAND_AS_CASE(id, type, get, set) case id: ret_value = get(((const type *) viewer->data) + tile_id, x, y); break;
 
 	switch(viewer->format) {
 		FOR_TILE_TYPE_LIST(EXPAND_AS_CASE);
