@@ -31,7 +31,7 @@ size_t Rom_GetRomSizeByTiles(Rom_Format format, size_t num_tiles);
 
 void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles);
 
-uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
+uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y);
 
 void Rom_SetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y, uint8_t c);
 
@@ -133,7 +133,7 @@ void Rom_AdvanceOffset(Rom_Viewer *viewer, size_t offset_tiles) {
 	viewer->num_tiles -= offset_tiles;
 }
 
-uint8_t Rom_GetTilePixelColor(Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
+uint8_t Rom_GetTilePixelColor(const Rom_Viewer *viewer, size_t tile_id, uint8_t x, uint8_t y) {
 	uint8_t ret_value = 0x00;
 
 	if(tile_id >= viewer->num_tiles) {
